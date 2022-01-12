@@ -1,16 +1,18 @@
 const TelegramBot = require('node-telegram-bot-api');
+
 require('dotenv').config();
 
 const tgbot_token = process.env.telegram_bot_token;
 const giphy_token = process.env.giphy_token;
 
-const https = require('https');
+const request = require('request');
 const options = {
-    hostname: 'http://api.giphy.com/v1/gifs/random',
-    api_key: giphy_token,
-    tag: 'ket',
-    method: 'GET'
-  }
+    uri: "http://api.giphy.com/v1/gifs/random",
+    qs:{
+      api_key: giphy_token,
+      tag: 'cat',
+    }
+};
 
 
 // Create a bot that uses 'polling' to fetch new updates
@@ -18,14 +20,10 @@ const bot = new TelegramBot(tgbot_token, {polling: true});
 
 //echo
 bot.onText(/\/echo (.+)/, (msg, match) => {
-  // 'msg' is the received Message from Telegram
-  // 'match' is the result of executing the regexp above on the text content
-  // of the message
 
   const chatId = msg.chat.id;
-  const resp = match[1]; // the captured "whatever"
+  const resp = match[1];
 
-  // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, resp);
 });
 
@@ -41,14 +39,26 @@ bot.on('message', (msg) => {
     let Hi = "hi";
     if (msg.text.toString().toLowerCase().indexOf(Hi) === 0) {
     bot.sendMessage(msg.chat.id,"Hello dear user");
-    console.log(msg.chat.id);
     }
 
 });
 //test giphy api
-//bot.onText(/\/cat (.+)/, (msg) => {
-//
-//
-//})
+bot.onText(/\/cat/, (msg) => {
+
+    request(options,function(err,response,body){
+        //console.log('response : ', response);
+        //console.log('body : ', body);
+        const result = JSON.parse(body);
+        //console.log(result);
+        console.log("send GIF URL : ", result.data.url /*+ '.gif'*/);
+        //console.error(err);
+        bot.sendMessage(msg.chat.id, result.data.url);
+        bot.sendAnimation(msg.chat.id, result.data.url);
+        //bot.sendPhoto(msg.chat.id, result.data.url);
+    });
+
+    
+
+});
 
     
