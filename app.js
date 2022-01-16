@@ -46,18 +46,11 @@ bot.on('message', (msg) => {
 bot.onText(/\/cat/, (msg) => {
 
     request(options,function(err,response,body){
-        //console.log('response : ', response);
-        //console.log('body : ', body);
         const result = JSON.parse(body);
-        //console.log(result);
-        console.log("send GIF URL : ", result.data.url /*+ '.gif'*/);
-        //console.error(err);
+        console.log("send GIF URL : ", result.data.url);
         bot.sendMessage(msg.chat.id, result.data.url);
-        bot.sendAnimation(msg.chat.id, result.data.url);
-        //bot.sendPhoto(msg.chat.id, result.data.url);
+        //bot.sendAnimation(msg.chat.id, result.data.url);
     });
-
-    
 
 });
 
